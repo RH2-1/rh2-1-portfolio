@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "RH2-1 — Bug Hunter & Security Researcher",
   description:
     "RH2-1 is an independent bug hunter and security researcher focused on API security, source code review, web application security, and responsible vulnerability reporting.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
