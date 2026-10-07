@@ -1,26 +1,1170 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #03050a;
+  --foreground: #ffffff;
+  /* Tint the browser's own UI (form controls, scrollbars) to match the page. */
+  color-scheme: dark;
+}
+
+html {
+  /* The scroll timeline is driven by window.scrollY, so the page must scroll
+     natively. This is a real scroll, not a transform-based fake. */
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  /* The 3D canvas is fixed; the content scrolls over it. */
+  overflow-x: hidden;
+}
+
+/* Chapters are exactly one viewport tall; this makes each section snap to a
+   whole story beat without hijacking the scroll. */
+section[id] {
+  scroll-margin-top: 0;
+}
+
+::selection {
+  background-color: rgb(111 141 255 / 0.35);
+}
+
+/* ------------------------------------------------------------------ */
+/* MY WRITEUPS — typed heading + staggered card reveals                */
+/* ------------------------------------------------------------------ */
+
+/* Block cursor: blinks while typing, fades out after the beat. */
+.wt-cursor {
+  animation: wt-blink 0.9s steps(1) infinite;
+}
+.wt-cursor--fade {
+  transition: opacity 0.9s ease;
+  opacity: 0;
+  animation: none;
+}
+@keyframes wt-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Cards rise in once the section has revealed. */
+.wt-card {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+}
+[data-revealed="true"] .wt-card {
+  animation: wt-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes wt-rise {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wt-cursor {
+    animation: none;
+  }
+  .wt-card {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+/* RH2 Enum project page — same amber terminal language, with a slower
+   editorial rhythm so the project can breathe outside the archive modal. */
+.rh2-project-page {
+  background-image: radial-gradient(circle at 76% 18%, rgb(242 163 94 / 0.08), transparent 28rem);
+}
+.rh2-project-hero {
+  isolation: isolate;
+  background: linear-gradient(135deg, #03050a 0%, #08090d 55%, #120d0a 100%);
+}
+.rh2-project-grid {
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgb(242 163 94 / 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(242 163 94 / 0.12) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to right, black, transparent 82%);
+  animation: rh2-grid-drift 18s linear infinite;
+}
+.rh2-project-orbit {
+  animation: rh2-orbit 18s ease-in-out infinite alternate;
+}
+.rh2-project-orbit--small {
+  animation-delay: -4s;
+  animation-duration: 13s;
+}
+.rh2-project-title {
+  animation: rh2-title-in 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.rh2-project-title span {
+  color: #f2a35e;
+  text-shadow: 0 0 32px rgb(242 163 94 / 0.2);
+}
+.rh2-project-specimen {
+  aspect-ratio: 4 / 5;
+  box-shadow: 0 0 70px rgb(242 163 94 / 0.1);
+  animation: rh2-specimen-in 0.9s 0.15s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.rh2-project-scan {
+  background: repeating-linear-gradient(to bottom, rgb(242 163 94 / 0.12) 0, rgb(242 163 94 / 0.12) 1px, transparent 1px, transparent 8px);
+  mix-blend-mode: screen;
+  animation: rh2-scan 3.5s ease-in-out infinite;
+}
+.rh2-project-live {
+  box-shadow: 0 0 18px rgb(242 163 94 / 0.95);
+  animation: rh2-live 1.6s ease-in-out infinite;
+}
+.rh2-module-card {
+  position: relative;
+  overflow: hidden;
+}
+.rh2-module-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: #f2a35e;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease;
+}
+.rh2-module-card:hover::after {
+  transform: scaleX(1);
+}
+@keyframes rh2-grid-drift {
+  to { background-position: 72px 72px, 72px 72px; }
+}
+@keyframes rh2-orbit {
+  from { transform: translate3d(0, 0, 0) rotate(-8deg); }
+  to { transform: translate3d(-24px, 18px, 0) rotate(8deg); }
+}
+@keyframes rh2-title-in {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); letter-spacing: 0.06em; }
+  to { opacity: 1; transform: translate3d(0, 0, 0); letter-spacing: -0.04em; }
+}
+@keyframes rh2-specimen-in {
+  from { opacity: 0; transform: translate3d(0, 32px, 0) rotate(2deg); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) rotate(0); }
+}
+@keyframes rh2-scan {
+  0%, 100% { opacity: 0.25; transform: translateY(-8%); }
+  50% { opacity: 0.75; transform: translateY(8%); }
+}
+@keyframes rh2-live {
+  0%, 100% { opacity: 0.45; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rh2-project-grid,
+  .rh2-project-orbit,
+  .rh2-project-title,
+  .rh2-project-specimen,
+  .rh2-project-scan,
+  .rh2-project-live {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* VULNERABILITY RESEARCH — archive field journal                      */
+/* ------------------------------------------------------------------ */
+
+/* Staggered card reveal: driven by the section's data-revealed flag; each
+   card's delay comes from its --i index. Cards carry their own base rotation
+   (--rot) and a parallax offset (--plx, desktop only) which hover respects
+   rather than overwrites. */
+.arc-item {
+  position: relative;
+  z-index: 10;
+}
+.arc-card {
+  opacity: 0;
+  transform: translate3d(0, 34px, 0) rotate(0deg);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 110ms);
+  will-change: transform, opacity;
+}
+[data-revealed="true"] .arc-card {
+  opacity: 1;
+  transform: translate3d(0, var(--plx, 0px), 0) rotate(var(--rot, 0deg));
+}
+/* Hover: un-tilt, lift, straighten — applied over the revealed transform. */
+[data-revealed="true"] .arc-card:hover {
+  transform: translate3d(0, calc(var(--plx, 0px) - 8px), 0) rotate(calc(var(--rot, 0deg) * 0.35));
+  transition-delay: 0ms;
+  z-index: 20;
+}
+
+/* Oversized floating words: ghost outlines drifting behind the grid. */
+.float-word {
+  position: absolute;
+  z-index: 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(247 237 225 / 0.07);
+  white-space: nowrap;
+  user-select: none;
+  will-change: transform;
+}
+.meta-label {
+  position: absolute;
+  z-index: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.22);
+}
+
+/* Heading scramble characters. Before their frame lands they are replaced
+   by random glyphs (JS); the amber flash marks the just-decoded char. */
+.arc-ch {
+  display: inline-block;
+  min-width: 0.24em;
+  color: rgb(247 237 225 / 0.16);
+  transition: color 0.12s ease, text-shadow 0.12s ease;
+}
+.arc-ch[data-done="false"] {
+  color: rgb(242 163 94 / 0.85);
+  text-shadow: 0 0 18px rgb(242 163 94 / 0.45);
+}
+.arc-ch[data-done="true"] {
+  color: #f7ede1;
+}
+
+/* Heading + intro fade-rises, staggered after the scramble lands. */
+.arc-fade {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+[data-revealed="true"] .arc-fade {
+  animation: arc-fade-in 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: calc(0.25s + var(--fd, 0ms));
+}
+@keyframes arc-fade-in {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Card decryption reveal — scroll-scrubbed via --dec (0…1), written by the
+   section's rAF loop. The plate un-redacts: it starts as a blocky corrupted
+   mess (contrast + hue-rotated + clipped) and resolves into the artwork;
+   an amber scan bar sweeps down in sync; the caption slides up behind a
+   redaction bar that lifts away. */
+.arc-plate {
+  filter:
+    contrast(1.9) brightness(0.72) saturate(0.2) hue-rotate(160deg)
+    blur(calc((1 - var(--dec, 0)) * 5px));
+  clip-path: inset(calc((1 - var(--dec, 0)) * 9%) 0 0 0);
+  transform: scale(calc(1.14 - 0.14 * var(--dec, 0)));
+  will-change: filter, clip-path, transform;
+}
+.arc-dec {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgb(7 4 2 / 0.85) 0px,
+      rgb(7 4 2 / 0.85) 5px,
+      transparent 5px,
+      transparent 9px
+    );
+  opacity: calc((1 - var(--dec, 0)) * 0.9);
+}
+.arc-dec::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--dec, 0) * 100%);
+  height: 3px;
+  background: #f2a35e;
+  box-shadow: 0 0 18px rgb(242 163 94 / 0.9), 0 0 44px rgb(242 163 94 / 0.45);
+  opacity: calc(var(--dec, 0) * (1 - var(--dec, 0)) * 4);
+}
+
+/* Caption redaction bar: covers the category line until --dec lands. */
+.arc-cat-dot {
+  display: inline-block;
+  width: 5.5em;
+  height: 0.85em;
+  margin-left: 0.6em;
+  vertical-align: text-bottom;
+  background: rgb(247 237 225 / 0.12);
+  clip-path: polygon(0 0, calc(var(--dec, 0) * 100%) 0, calc(var(--dec, 0) * 100%) 100%, 0 100%);
+}
+
+/* Inspection grid: a faint targeting grid that follows the pointer across
+   each plate (desktop only), like a loupe over the specimen. */
+.arc-inspect {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background:
+    linear-gradient(to right, rgb(242 163 94 / 0.1) 1px, transparent 1px)
+      calc(var(--mx, 50%) * 2 - 50%) 0 / 25% 100% no-repeat,
+    linear-gradient(to bottom, rgb(242 163 94 / 0.1) 1px, transparent 1px) 0
+      calc(var(--my, 50%) * 2 - 50%) / 100% 25% no-repeat,
+    radial-gradient(24% 20% at var(--mx, 50%) var(--my, 50%), rgb(242 163 94 / 0.12), transparent 100%);
+}
+.group:hover .arc-inspect {
+  opacity: 1;
+}
+
+/* Hover scan bar: one bright band crossing the plate on hover. */
+.arc-scanbar {
+  position: absolute;
+  inset-inline: 0;
+  top: -18%;
+  height: 16%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(242 163 94 / 0.16) 40%,
+    rgb(247 237 225 / 0.3) 50%,
+    rgb(242 163 94 / 0.16) 60%,
+    transparent
+  );
+  opacity: 0;
+}
+
+/* Writeup detail layer: additive to the archive card treatment. */
+.writeup-dialog {
+  animation: writeup-backdrop-in 0.35s ease-out both;
+}
+.writeup-panel {
+  width: min(94vw, 1600px);
+  height: min(92svh, calc(94vw * 0.5625));
+  min-height: 0;
+  transform-origin: 50% 12%;
+  animation: writeup-panel-in 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.writeup-panel-scan {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgb(242 163 94 / 0.08) 0,
+      rgb(242 163 94 / 0.08) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    linear-gradient(120deg, transparent 0 42%, rgb(242 163 94 / 0.16) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: writeup-scan 1.8s ease-out 0.15s both;
+}
+@keyframes writeup-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes writeup-panel-in {
+  from { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.97); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes writeup-scan {
+  from { opacity: 0; transform: translate3d(-18%, 0, 0); }
+  to { opacity: 1; transform: translate3d(18%, 0, 0); }
+}
+
+/* The cinematic frame stays 16:9 where the viewport allows it. Portrait
+   tablets and phones use the full available height so long reports remain
+   comfortable to read instead of becoming a tiny letterbox. */
+@media (max-width: 1023px) {
+  .writeup-panel {
+    width: calc(100vw - 1rem);
+    height: calc(100svh - 1rem);
+  }
+}
+@media (max-width: 1023px) and (orientation: landscape) {
+  .writeup-panel {
+    width: min(96vw, 1200px);
+    height: min(94svh, calc(96vw * 0.5625));
+  }
+}
+@media (max-width: 639px) {
+  .writeup-panel-grid {
+    display: block;
+    height: auto;
+    min-height: 100%;
+  }
+  .writeup-panel-content {
+    max-height: calc(100svh - 17rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .writeup-dialog,
+  .writeup-panel,
+  .writeup-panel-scan {
+    animation: none;
+  }
+}
+.group:hover .arc-scanbar {
+  animation: arc-scan 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+@keyframes arc-scan {
+  0% {
+    top: -18%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    top: 104%;
+    opacity: 0;
+  }
+}
+
+/* Live status dot on the "observe" word. */
+.arc-live {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.06em;
+  margin-left: 0.08em;
+  border-radius: 9999px;
+  background: #ff5c3d;
+  box-shadow: 0 0 0.1em #ff5c3d, 0 0 0.25em rgb(255 92 61 / 0.6);
+  animation: exh-blink 1.1s steps(1) infinite;
+}
+
+/* Reduced motion: everything readable, nothing scrubbed. */
+@media (prefers-reduced-motion: reduce) {
+  .arc-plate {
+    filter: none;
+    clip-path: none;
+    transform: none;
+  }
+  .arc-dec,
+  .arc-inspect,
+  .arc-scanbar {
+    display: none;
+  }
+  .arc-cat-dot {
+    display: none;
+  }
+  .arc-fade {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .arc-ch {
+    color: #f7ede1;
+  }
+}
+
+/* The CTA breathes once when the section reveals. */
+.arc-cta {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+[data-revealed="true"] .arc-cta {
+  animation: arc-cta-rise 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) 0.55s forwards;
+}
+@keyframes arc-cta-rise {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* FOOTER — art-book final page                                        */
+/* ------------------------------------------------------------------ */
+
+/* The giant wordmark resolves from a corrupted transmission: --fx goes
+   1 → 0 as the footer scrolls into place (written by the rAF loop).
+   RGB-split text-shadows collapse, the skew straightens, the ghost layer
+   merges back into the letters. */
+.ft-word {
+  --fx: 1;
+  transform: skewX(calc(var(--fx) * -5deg));
+}
+.ft-word .ft-letter {
+  text-shadow:
+    calc(var(--fx) * -0.06em) 0 rgb(255 92 61 / calc(var(--fx) * 0.55)),
+    calc(var(--fx) * 0.06em) 0 rgb(242 163 94 / calc(var(--fx) * 0.55)),
+    0 0 calc(var(--fx) * 0.4em) rgb(242 163 94 / calc(var(--fx) * 0.3));
+}
+
+.ft-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.35em, 0);
+}
+
+.contact-email--glow {
+  color: #f2a35e;
+  text-shadow: 0 0 12px rgb(242 163 94 / 0.9), 0 0 30px rgb(242 163 94 / 0.45);
+  animation: contact-email-glow 0.9s ease-in-out 3;
+}
+@keyframes contact-email-glow {
+  0%, 100% { filter: brightness(1); transform: translateX(0); }
+  50% { filter: brightness(1.6); transform: translateX(4px); }
+}
+[data-revealed="true"] .ft-letter {
+  animation: ft-rise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: calc(var(--l, 0) * 70ms);
+}
+@keyframes ft-rise {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-card,
+  .arc-cta,
+  .ft-letter {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  /* Keep the base tilt without the motion. */
+  .arc-card {
+    transform: rotate(var(--rot, 0deg));
+  }
+}
+
+/* Respect the OS-level motion preference for the CSS-driven parts too. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* CURSOR — the RH2-1 target-lock reticle                              */
+/* ------------------------------------------------------------------ */
+
+/* Hide the native cursor only on fine-pointer devices that run the
+   custom one (html.cur-on is added by the Cursor component). */
+@media (pointer: fine) {
+  html.cur-on,
+  html.cur-on a,
+  html.cur-on button,
+  html.cur-on [data-cursor] {
+    cursor: none;
+  }
+}
+
+.cur-root {
+  transition: opacity 0.4s ease;
+}
+
+.cur-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 5px;
+  width: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 9999px;
+  background: #f7ede1;
+  box-shadow:
+    0 0 6px rgb(247 237 225 / 0.9),
+    0 0 14px rgb(242 163 94 / 0.5);
+}
+
+.cur-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  background: #f2a35e;
+  filter: blur(1px);
+  opacity: 0;
+}
+
+/* The reticle: four corner brackets + a hairline cross, all inside a
+   rotating, scaling inner box. data-lock flips the whole system red-hot. */
+.cur-ret {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.cur-ret-in {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  transition: none;
+}
+.cur-c {
+  position: absolute;
+  height: 9px;
+  width: 9px;
+  border-color: rgb(242 163 94 / 0.9);
+  border-style: solid;
+  border-width: 0;
+  transition: border-color 0.18s ease;
+}
+.cur-c-tl {
+  top: 0;
+  left: 0;
+  border-top-width: 1.5px;
+  border-left-width: 1.5px;
+}
+.cur-c-tr {
+  top: 0;
+  right: 0;
+  border-top-width: 1.5px;
+  border-right-width: 1.5px;
+}
+.cur-c-bl {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 1.5px;
+  border-left-width: 1.5px;
+}
+.cur-c-br {
+  bottom: 0;
+  right: 0;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
+}
+.cur-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 5px;
+  width: 1px;
+  background: rgb(242 163 94 / 0.55);
+  box-shadow: 8px 0 0 rgb(242 163 94 / 0.55), -8px 0 0 rgb(242 163 94 / 0.55);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Locked state: brackets go red-hot and brighten. */
+.cur-ret[data-lock="true"] .cur-c {
+  border-color: #ff5c3d;
+}
+.cur-ret[data-lock="true"] .cur-cross {
+  background: rgb(255 92 61 / 0.9);
+  box-shadow:
+    8px 0 0 rgb(255 92 61 / 0.9),
+    -8px 0 0 rgb(255 92 61 / 0.9);
+}
+
+/* Click shockwave. */
+.cur-pulse {
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 9999px;
+  border: 1.5px solid #f2a35e;
+  animation: cur-pulse 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  pointer-events: none;
+}
+@keyframes cur-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+}
+
+/* Coordinate readout. */
+.cur-coord {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: rgb(247 237 225 / 0.38);
+  white-space: nowrap;
+}
+
+/* Lock label — the red-hot tag above the reticle. */
+.cur-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #ff5c3d;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+.cur-label[data-on="true"] {
+  opacity: 1;
+}
+.cur-label[data-on="true"]::after {
+  content: " //";
+  color: rgb(242 163 94 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cur-ghost,
+  .cur-pulse {
+    display: none;
+  }
+}
+
+/* Amber phosphor tint over every archive plate — pulls the generated
+   artwork into the BUG-HUNTER palette (multiply deepens blacks to ember,
+   screen lays a faint amber wash on highlights) and lifts slightly on
+   hover so the zoom feels like a lamp coming up. */
+.arc-plate-tint {
+  background:
+    linear-gradient(to top, rgb(7 4 2 / 0.5), transparent 40%),
+    radial-gradient(120% 100% at 50% 40%, rgb(242 163 94 / 0.08), transparent 70%);
+  mix-blend-mode: normal;
+  transition: opacity 0.5s ease;
+  opacity: 0.9;
+}
+.group:hover .arc-plate-tint {
+  opacity: 0.45;
+}
+
+/* ------------------------------------------------------------------ */
+/* EXHIBIT — the RH2-1 terminal (borderless, scroll-typed)             */
+/* ------------------------------------------------------------------ */
+
+.exh-term {
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(13px, 1.55vw, 17px);
+  line-height: 1.75;
+  color: #f7ede1;
+  text-shadow:
+    0 0 8px rgb(242 163 94 / 0.35),
+    0 0 24px rgb(242 163 94 / 0.12);
+}
+
+.tl {
+  min-height: 1.75em;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.tl-pre {
+  color: rgb(242 163 94 / 0.85);
+}
+.tl-cmd {
+  color: inherit;
+}
+.tl.out {
+  padding-left: 0.6em;
+}
+.tl.out-hi {
+  color: #f2a35e;
+  font-weight: 700;
+}
+.tl.out-amber {
+  color: #f2a35e;
+}
+.tl.out-dim {
+  color: rgb(247 237 225 / 0.5);
+}
+
+/* Idle boot log — the terminal's own life. A [|] caret blinks at the
+   typing position while the log types; once the log completes
+   (data-glitch="true") the caret stops and the settled text gets
+   occasional RGB-split glitch bursts. Scrolling away kills all activity. */
+.exh-idle {
+  margin-top: 0.4em;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(12px, 1.4vw, 15px);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  color: rgb(247 237 225 / 0.55);
+  text-shadow: 0 0 8px rgb(242 163 94 / 0.2);
+  transition: opacity 0.4s ease;
+}
+.exh-idle::after {
+  content: "[|]";
+  display: inline-block;
+  margin-left: 1px;
+  color: #f2a35e;
+  animation: exh-blink 0.72s steps(1) infinite;
+}
+.exh-idle[data-glitch="true"]::after {
+  content: none;
+}
+.exh-idle[data-glitch="true"] {
+  animation: idle-glitch 5.5s steps(1) infinite;
+}
+@keyframes idle-glitch {
+  0%,
+  91%,
+  100% {
+    text-shadow: 0 0 8px rgb(242 163 94 / 0.2);
+    transform: none;
+    opacity: 1;
+  }
+  92% {
+    text-shadow:
+      -2px 0 rgb(255 92 61 / 0.8),
+      2px 0 rgb(242 163 94 / 0.8);
+    transform: translateX(1.5px) skewX(-2deg);
+    opacity: 0.92;
+  }
+  93.5% {
+    text-shadow:
+      2px 0 rgb(255 92 61 / 0.7),
+      -2px 0 rgb(242 163 94 / 0.7);
+    transform: translateX(-1px);
+    opacity: 1;
+  }
+  95% {
+    text-shadow: 0 0 8px rgb(242 163 94 / 0.2);
+    transform: none;
+    opacity: 0.96;
+  }
+  96% {
+    opacity: 1;
+  }
+}
+
+/* Cursor: visible only while its line is actively typing. */
+.tl-cur {
+  display: inline-block;
+  width: 0.62em;
+  margin-left: 1px;
+  color: #ff5c3d;
+  opacity: 0;
+}
+.tl-cur.on {
+  animation: exh-blink 0.72s steps(1) infinite;
+}
+@keyframes exh-blink {
+  0%,
+  49% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgb(255 92 61 / 0.8);
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Full-screen identity letters: glitch-in from an amber ghost. */
+.nl {
+  display: inline-block;
+  opacity: 0.06;
+  transform: translateY(0.14em);
+  color: #f7ede1;
+  position: relative;
+}
+.nl.on {
+  animation: nl-in 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes nl-in {
+  0% {
+    opacity: 0.06;
+    transform: translateY(0.14em);
+    text-shadow: 0 0 0 rgb(242 163 94 / 0);
+  }
+  38% {
+    opacity: 1;
+    transform: translateY(-0.045em) skewX(-7deg);
+    text-shadow:
+      -0.055em 0 rgb(255 92 61 / 0.85),
+      0.055em 0 rgb(242 163 94 / 0.85),
+      0 0 34px rgb(242 163 94 / 0.5);
+  }
+  70% {
+    transform: translateY(0.02em) skewX(3deg);
+    text-shadow:
+      -0.03em 0 rgb(255 92 61 / 0.55),
+      0.03em 0 rgb(242 163 94 / 0.55);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) skewX(0);
+    text-shadow:
+      -0.02em 0 rgb(255 92 61 / 0.4),
+      0.02em 0 rgb(242 163 94 / 0.45),
+      0 0 22px rgb(242 163 94 / 0.28);
+  }
+}
+.nl-outline {
+  color: transparent;
+  -webkit-text-stroke: 2px #f2a35e;
+}
+
+.exh-cur {
+  display: inline-block;
+  margin-left: 2px;
+  color: #ff5c3d;
+  animation: exh-blink 0.72s steps(1) infinite;
+}
+
+.exh-prompt {
+  transition: opacity 0.6s ease;
+}
+
+/* CRT power-on: a bright horizontal line (scaleX by --cx) that expands
+   vertically (--cy) into a full white-amber flash, then fades. */
+.exh-crt {
+  background:
+    radial-gradient(
+      calc(var(--cy, 0.006) * 100%) calc(var(--cy, 0.006) * 42%) at 50% 50%,
+      rgb(247 237 225 / 0.9),
+      rgb(242 163 94 / 0.45) 55%,
+      transparent 100%
+    );
+  clip-path: polygon(
+    calc(50% - var(--cx, 0.12) * 50%) 0%,
+    calc(50% + var(--cx, 0.12) * 50%) 0%,
+    calc(50% + var(--cx, 0.12) * 50%) 100%,
+    calc(50% - var(--cx, 0.12) * 50%) 100%
+  );
+  mix-blend-mode: screen;
+}
+
+/* Phosphor scanlines + barely-there flicker over the whole screen. */
+.exh-scanlines {
+  z-index: 40;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0) 0px,
+    rgb(0 0 0 / 0) 2px,
+    rgb(0 0 0 / 0.14) 3px
+  );
+  animation: exh-flicker 4.2s steps(1) infinite;
+}
+@keyframes exh-flicker {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  7% {
+    opacity: 0.62;
+  }
+  8% {
+    opacity: 0.5;
+  }
+  54% {
+    opacity: 0.58;
+  }
+  55% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exh-scanlines {
+    animation: none;
+  }
+  .nl {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .exh-idle::after {
+    content: none;
+  }
+  .exh-idle[data-glitch="true"] {
+    animation: none;
+  }
+}
+
+/* About Me — a quiet field-note interlude between the terminal exhibit and
+   the writeup archive. The amber lines echo the hero without competing with
+   the research cards that follow. */
+.about-me-section {
+  isolation: isolate;
+}
+
+.about-me-grid {
+  opacity: 0.38;
+  background-image:
+    linear-gradient(rgb(242 163 94 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(242 163 94 / 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 75%, transparent);
+}
+
+.about-me-orbit {
+  animation: about-me-orbit 18s linear infinite;
+}
+
+.about-me-copy,
+.about-me-skills {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+.about-me-section[data-revealed="true"] .about-me-copy {
+  animation: about-me-reveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.about-me-section[data-revealed="true"] .about-me-skills {
+  animation: about-me-reveal 0.85s 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.about-me-terminal-wrap {
+  animation: about-me-terminal-drift 7s ease-in-out infinite;
+}
+
+.about-me-terminal {
+  box-shadow:
+    0 0 0 1px rgb(242 163 94 / 0.04),
+    0 24px 90px rgb(0 0 0 / 0.34),
+    inset 0 0 50px rgb(242 163 94 / 0.035);
+}
+
+.about-me-terminal-art {
+  color: rgb(247 237 225 / 0.72);
+  filter: drop-shadow(0 0 9px rgb(242 163 94 / 0.18));
+  animation: about-me-terminal-pulse 4.5s ease-in-out infinite;
+}
+
+.about-me-terminal-scan {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(242 163 94 / 0.13),
+    transparent
+  );
+  transform: translateY(-140%);
+  animation: about-me-scan 5.5s ease-in-out infinite;
+}
+
+.about-me-signoff {
+  border-left: 2px solid rgb(242 163 94 / 0.55);
+  padding-left: 1rem;
+}
+
+.about-skill-card {
+  transition:
+    border-color 300ms ease,
+    background-color 300ms ease,
+    transform 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.about-skill-card::before {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, #f2a35e, transparent 70%);
+  content: "";
+  opacity: 0.35;
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.about-skill-card:hover {
+  border-color: rgb(242 163 94 / 0.42);
+  background-color: rgb(12 13 18 / 0.92);
+  box-shadow: 0 15px 40px rgb(0 0 0 / 0.24);
+  transform: translateY(-4px);
+}
+
+.about-skill-card:hover::before {
+  opacity: 0.9;
+  transform: scaleX(1);
+}
+
+@keyframes about-me-reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes about-me-orbit {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.04);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes about-me-terminal-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes about-me-terminal-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes about-me-scan {
+  0%,
+  18% {
+    transform: translateY(-140%);
+  }
+  55%,
+  75% {
+    transform: translateY(420%);
+  }
+  100% {
+    transform: translateY(420%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-me-orbit,
+  .about-me-terminal-wrap,
+  .about-me-terminal-art,
+  .about-me-terminal-scan {
+    animation: none;
+  }
+
+  .about-me-copy,
+  .about-me-skills {
+    opacity: 1;
+    transform: none;
+  }
 }
